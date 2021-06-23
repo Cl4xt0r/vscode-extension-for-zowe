@@ -41,6 +41,7 @@ import SpoolProvider from "./SpoolProvider";
 import * as nls from "vscode-nls";
 import { TsoCommandHandler } from "./command/TsoCommandHandler";
 import { cleanTempDir, moveTempFolder } from "./utils/TempFolder";
+import { Key } from "selenium-webdriver";
 
 // Set up localization
 nls.config({
@@ -57,6 +58,35 @@ const localize: nls.LocalizeFunc = nls.loadMessageBundle();
  * @returns {Promise<ZoweExplorerApiRegister>}
  */
 export async function activate(context: vscode.ExtensionContext): Promise<ZoweExplorerApiRegister> {
+    // Standardize Zowe Explorer configuration properties if necessary
+    const standardizeName = (name: string): string => {
+        let newName = "";
+        //Camel case
+        // if (/^([a-z]+)(([A-Z]([a-z]+))+)$/.test(name)) {
+        //     // change to dot notation
+        // }
+        // Kabab case
+        if (name.includes("-")) {
+            newName = name.replace(/-/g, ".");
+        } else if (name.includes(":")) {
+            newName = name.replace(":", ".").replace(/\s/g, "");
+        } else {
+            return name;
+        }
+        return newName;
+    };
+
+    // Access all configuration settings for ZE extension
+    let settingsFile: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
+    Object.keys(settingsFile)
+        .filter((setting) => setting.match(/Zowe*/i))
+        .forEach((settingName) => {
+            console.log("before: " + settingName);
+            const standardizedSettingName = standardizeName(settingName);
+            console.log("after: " + standardizedSettingName);
+            // settingsFile.update(settingName, standardizedSettingName, true);
+        });
+
     // Get temp folder location from settings
     let preferencesTempPath: string = vscode.workspace
         .getConfiguration()
