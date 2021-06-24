@@ -67,9 +67,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<ZoweEx
         // }
         // Kabab case
         if (name.includes("-")) {
-            newName = name.replace(/-/g, ".");
+            if (name.includes("Default-Datasets")) {
+                newName = name.replace(/-/, ".").replace(/-/, "").replace(/-/, ".");
+            } else {
+                newName = name.replace(/-/, ".").replace(/-/g, "");
+            }
         } else if (name.includes(":")) {
-            newName = name.replace(":", ".").replace(/\s/g, "");
+            newName = name.replace(":", ".").replace(/\s/, ".").replace(/\s/g, "");
         } else {
             return name;
         }
@@ -81,9 +85,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<ZoweEx
     Object.keys(settingsFile)
         .filter((setting) => setting.match(/Zowe*/i))
         .forEach((settingName) => {
-            console.log("before: " + settingName);
+            // console.log("before: " + settingName);
             const standardizedSettingName = standardizeName(settingName);
-            console.log("after: " + standardizedSettingName);
+            console.log(standardizedSettingName);
             // settingsFile.update(settingName, standardizedSettingName, true);
         });
 
